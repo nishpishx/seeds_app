@@ -1,0 +1,60 @@
+from flask import Flask, Response
+import json
+from datetime import datetime
+import roslibpy
+import threading
+
+app = Flask(__name__)
+
+geojson = {
+    "type": "FeatureCollection",
+    "metadata": {
+        "api": "1.0",
+        "count": 0,
+        "generated": int(datetime.utcnow().timestamp() * 1000),
+        "status": 200,
+        "title": "Fake Robot Seed Drops",
+        "url": "http://YOUR_PUBLIC_IP_OR_DOMAIN/seeds.geojson"
+    },
+    "features": []
+}
+
+def add_gps_point(seed_id, lon, lat):
+    geojson["features"].append({
+        "type": "Feature",
+        "id": f"seed_{seed_id}",
+        "geometry": {"type": "Point", "coordinates": [lon, lat]},
+        "properties": {"timestamp": datetime.utcnow().isoformat() + "Z", "type": "seed_drop"}
+    })
+    geojson["metadata"]["count"] = len(geojson["features"])
+    geojson["metadata"]["generated"] = int(datetime.utcnow().timestamp() * 1000)
+
+
+client = roslibpy.Ros(host='100.126.150.122', port=9091) 
+client.run()  
+
+def gps_callback(msg):
+    # Each NavSatFix message has latitude, longitude, 
+    add_gps_point(msg['longitude'],msg['longitude'], msg['latitude'])
+# Subscribe to mirrored GPS topic
+listener = roslibpy.Topic(client, '/mirrored_gps', 'sensor_msgs/msg/NavSatFix')
+listener.subscribe(gps_callback)
+
+@app.route("/seeds.geojson") 
+def get_geojson(): 
+    return Response(json.dumps(geojson), mimetype="application/json")
+# Run Flask in a thread to allow ros client to run 
+# concurrently
+def run_flask(): 
+    app.run(host="0.0.0.0", port=5000) 
+
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
+# Keep main thread alive for ros client
+try: 
+    import time 
+    while True: 
+        time.sleep(1)
+except KeyboardInterrupt: 
+    listener.unsubscribe()
+    client.terminate()
