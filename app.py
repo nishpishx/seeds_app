@@ -43,7 +43,7 @@ def plan_mission():
         seeds = int(data["seeds"])
         base_lon = float(data["lon"])
         base_lat = float(data["lat"])
-
+        print(base_lat)
         # 1. Generate seeds (fast)
         seed_coords = generate_seed_coords(
             width=width,
