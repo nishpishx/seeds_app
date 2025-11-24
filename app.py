@@ -4,7 +4,7 @@ from datetime import datetime
 import roslibpy
 import threading
 import time
-from seed_generator import generate_seed_coords, batch_insert_seeds
+from seed_generator import generate_seed_coords
 
 app = Flask(__name__)
 
@@ -53,8 +53,6 @@ def plan_mission():
             base_lat=base_lat
         )
 
-        # 2. Batch insert into PostGIS in one SQL call
-        batch_insert_seeds(seed_coords)
 
         return jsonify({
             "status": "ok",
