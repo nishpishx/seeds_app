@@ -4,7 +4,7 @@ from datetime import datetime
 import roslibpy
 import threading
 import time
-from seed_generator import generate_seed_coords
+
 
 app = Flask(__name__)
 
@@ -32,35 +32,6 @@ def add_gps_point(seed_id, lon, lat):
     geojson["metadata"]["count"] = len(geojson["features"])
     geojson["metadata"]["generated"] = int(datetime.utcnow().timestamp() * 1000)
 
-
-@app.route("/plan_mission", methods=["POST"])
-def plan_mission():
-    try:
-        data = request.get_json()
-
-        width = float(data["width"])
-        length = float(data["length"])
-        seeds = int(data["seeds"])
-        base_lon = float(data["lon"])
-        base_lat = float(data["lat"])
-        print(base_lat)
-        # 1. Generate seeds (fast)
-        seed_coords = generate_seed_coords(
-            width=width,
-            length=length,
-            num_seeds=seeds,
-            base_lon=base_lon,
-            base_lat=base_lat
-        )
-
-
-        return jsonify({
-            "status": "ok",
-            "num_seeds": len(seed_coords)
-        })
-
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
 
 
 @app.route('/seeds.geojson')
