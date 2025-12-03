@@ -38,9 +38,14 @@ def seeds_geojson():
     seeds  = int(data.get("seeds", 25))
     lon    = float(data.get("lon", -122.55259))
     lat    = float(data.get("lat", 48.3371))
+    deployment = data.get("deployment", False)
 
     mission_seeds = generate_mission_seeds(width, length, seeds, lon, lat)
-
+    if deployment:
+        # Simulate saving in PostGIS
+        print(f"[INFO] Deployment plan received: {len(mission_seeds)} seeds saved in PostGIS")
+    else:
+        print(f"[INFO] Tentative plan received: {len(mission_seeds)} seeds (not saved)")
     return jsonify({
         "num_seeds": len(mission_seeds),
         "seeds": mission_seeds
