@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 # ---- FUNCTION TO GENERATE MISSION SEEDS ----
 def generate_mission_seeds(width, length, seeds, lon, lat):
+    print(width, length, seeds, lon, lat)
     # Convert meters to degrees
     m_to_deg_lat = 1 / 111320
     m_to_deg_lon = 1 / (111320 * math.cos(math.radians(lat)))
