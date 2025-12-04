@@ -1,47 +1,58 @@
-
-
+# seed_generator.py
+import fields2cover as f2c
+from shapely.geometry import Polygon, mapping, LineString
 import math
 
-def generate_seed_coords(width_m, length_m, num_seeds, base_lon, base_lat):
+def generate_seed_coords(width, length, row_spacing=2.0, plant_spacing=0.5):
     """
-    Generate evenly spaced seed coordinates inside a rectangular area.
+    Generate coverage path and planting plan.
 
-    width_m  = rectangle width in meters   (east-west)
-    length_m = rectangle height in meters  (north-south)
-    num_seeds = total seeds to generate
-    base_lon, base_lat = bottom-left corner in degrees
+    Args:
+        width (float): field width (meters)
+        length (float): field length (meters)
+        row_spacing (float): distance between coverage rows (meters)
+        plant_spacing (float): distance between plants along a row (meters)
+
+    Returns:
+        dict: GeoJSON FeatureCollection with LineString path and planting properties
     """
+    # 1. Rectangle polygon
+    coords = [(0, 0), (width, 0), (width, length), (0, length), (0, 0)]
+    poly = Polygon(coords)
 
-    # Convert meters → degrees
-    deg_per_m_lat = 1 / 111320                                  # meters per degree latitude
-    deg_per_m_lon = 1 / (111320 * math.cos(math.radians(base_lat)))
+    # 2. Fields2Cover polygon and farm
+    points = [f2c.geometry.Point(x, y) for x, y in poly.exterior.coords]
+    f2c_poly = f2c.geometry.Polygon(points)
+    farm = f2c.fields.Farm(f2c_poly)
+    field = farm.fields[0]
 
-    # Rectangle dimensions in degrees
-    delta_lat = length_m * deg_per_m_lat
-    delta_lon = width_m  * deg_per_m_lon
+    # 3. Generate swaths and coverage path
+    swaths = f2c.swaths.generate_swaths(field, row_spacing)
+    path = f2c.paths.generate_coverage_path(swaths)
 
-    coords = []
+    # 4. Convert path to LineString
+    coords_path = [(p.x, p.y) for p in path.get_points()]
+    line = LineString(coords_path)
 
-    # Make a square-ish grid
-    rows = int(math.sqrt(num_seeds))
-    cols = math.ceil(num_seeds / rows)
+    # 5. Calculate number of plants
+    total_length = line.length
+    num_plants = max(1, math.floor(total_length / plant_spacing))
 
-    # Step sizes in degrees
-    step_lat = delta_lat / (rows - 1) if rows > 1 else 0
-    step_lon = delta_lon / (cols - 1) if cols > 1 else 0
-
-    count = 0
-    for r in range(rows):
-        for c in range(cols):
-            if count >= num_seeds:
-                break
-
-            lat = base_lat + r * step_lat
-            lon = base_lon + c * step_lon
-
-            coords.append((lon, lat))
-            count += 1
-
-    return coords
+    # 6. Return GeoJSON with planting info
+    mission_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": mapping(line),
+                "properties": {
+                    "row_spacing": row_spacing,
+                    "plant_spacing": plant_spacing,
+                    "num_plants": num_plants
+                }
+            }
+        ]
+    }
+    return mission_geojson
 
 
