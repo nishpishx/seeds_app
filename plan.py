@@ -20,7 +20,7 @@ def generate_mission():
     row_spacing = data.get("row_spacing", 2.0)
     plant_spacing = data.get("plant_spacing", 0.5)
 
-    mission_geojson = generate_seed_coords(base_lat, base_lon, width, length, row_spacing, plant_spacing)
+    mission_geojson = generate_seed_coords(lat, lon, width, length, row_spacing, plant_spacing)
     return jsonify(mission_geojson)
 
 if __name__ == "__main__":
