@@ -9,10 +9,14 @@ app = Flask(__name__)
 @app.route("/seeds.geojson", methods=["POST"])
 def generate_mission():
     data = request.get_json()
-    base_lat = data["base_lat"]
-    base_lon = data["base_lon"]
-    width = data.get("width", 50)
-    length = data.get("length", 50)
+   
+    
+    
+    width  = float(data.get("width", 10))
+    length = float(data.get("length", 10))
+    seeds  = int(data.get("seeds", 25))
+    lon    = float(data.get("lon", -122.55259))
+    lat    = float(data.get("lat", 48.3371))
     row_spacing = data.get("row_spacing", 2.0)
     plant_spacing = data.get("plant_spacing", 0.5)
 
