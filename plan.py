@@ -8,7 +8,9 @@ CORS(app)
 # Generate mission with plant spacing
 # --------------------------
 @app.route("/seeds.geojson", methods=["POST"])
+print("hello")
 def generate_mission():
+   
     data = request.get_json()
     
     row_spacing = 2.0
@@ -21,6 +23,7 @@ def generate_mission():
     lat    = float(data.get("lat", 48.3371))
     lon    = float(data.get("lon", -122.55259))
     mission_geojson = generate_seed_coords(lat, lon, width, length, row_spacing, plant_spacing)
+    print (mission_geojson)
 
     return jsonify(mission_geojson)
 
