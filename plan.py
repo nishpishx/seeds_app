@@ -1,6 +1,6 @@
 from flask_cors import CORS
 from flask import Flask, request, jsonify
-from seed_generator import generate_seed_coords
+from seed_generator import generate_seed_coords, generate_seed_coords_polygon
 
 app = Flask(__name__)
 CORS(app)
