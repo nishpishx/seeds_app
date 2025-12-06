@@ -42,6 +42,6 @@ path_dubins = path_planner.planPath(robot, swaths_sorted, dubins)
 # 6. Visualize field and path
 # ----------------------------
 f2c.Visualizer.figure()
-f2c.Visualizer.plotField(field)
-f2c.Visualizer.plotPath(path_dubins)
+#f2c.Visualizer.plotField(field)
+f2c.Visualizer.plot(path_dubins)
 f2c.Visualizer.show()
