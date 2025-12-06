@@ -8,7 +8,6 @@ CORS(app)
 # Generate mission with plant spacing
 # --------------------------
 @app.route("/seeds.geojson", methods=["POST"])
-
 def generate_mission():
     print("hello")
     data = request.get_json()
