@@ -19,9 +19,9 @@ def generate_mission():
     perimeter = [(x, y) for x, y in coords]
     print(perimeter)
    
-    generate_path_csv(perimeter, csv_filename="path.csv")
-    return "hello"
-
+    
+    result = generate_path_csv(perimeter, csv_filename="path.csv")
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
