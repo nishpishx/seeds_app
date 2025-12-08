@@ -1,5 +1,6 @@
 import fields2cover as f2c
 import math
+import json
 # Your perimeter (must be closed)
 
 def generate_path_csv(perimeter, csv_filename="path.csv"):
