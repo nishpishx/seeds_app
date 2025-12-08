@@ -1,9 +1,22 @@
 import math
 import fields2cover as f2c
+polygon_xy = [
+    (0.0, 0.0),
+    (120.0, 10.0),
+    (140.0, 80.0),
+    (100.0, 150.0),
+    (20.0, 140.0),
+    (-10.0, 60.0)
+]
+cell = f2c.Cell()
+for x, y in polygon_xy:
+    cell.appendPoint(x, y)
+
+field = f2c.Field([cell])
 
 rand = f2c.Random(42)
 robot = f2c.Robot(2.0, 6.0)
-field = rand.generateRandField(1e4, 5);
+#field = rand.generateRandField(1e4, 5);
 cells = field.getField();
 const_hl = f2c.HG_Const_gen()
 no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.getWidth())
