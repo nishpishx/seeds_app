@@ -33,8 +33,6 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     rand = f2c.Random(42)
     robot = f2c.Robot(2.0, 6.0)
     const_hl = f2c.HG_Const_gen()
-    field = f2c.Field(cells);
-    field.setEPSGCoordSystem(4326);
     robot.setMinTurningRadius(2)  # m
     robot.setMaxDiffCurv(0.1);  # 1/m^2
     path_planner = f2c.PP_PathPlanning()
@@ -45,9 +43,7 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     swaths = snake_sorter.genSortedSwaths(swaths)
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
-    path_gps = f2c.Transform.transformPathWithFieldRef(path_dubins, field, "EPSG:4326");
-    path_gps.saveToFile("path.csv");
-    geojson_path = path_gps.toLineString();
+    geojson_path = path_dubins.toLineString();
     print(geojson_path);
     
     f2c.Visualizer.figure();
