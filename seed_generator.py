@@ -33,11 +33,11 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     
     rand = f2c.Random(42)
     robot = f2c.Robot(2.0, 6.0)
-    const_hl = f2c.HG_Const_gen()
-    robot.setMinTurningRadius(2)  # m
+    robot.setMinTurningRadius(0.002)  # m
     robot.setMaxDiffCurv(0.1);  # 1/m^2
     path_planner = f2c.PP_PathPlanning()
-    no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.getWidth())
+    
+    no_hl = cells
     bf = f2c.SG_BruteForce()
     swaths = bf.generateSwaths(math.pi, robot.getCovWidth(), no_hl.getGeometry(0))
     snake_sorter = f2c.RP_Snake()
