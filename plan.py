@@ -12,19 +12,15 @@ def generate_mission():
     print("hello")
     data = request.get_json()
     print(data)
-    row_spacing = 2.0
-    plant_spacing = 0.5
+   
 
 
-    
-    width  = float(data.get("width", 10))
-    length = float(data.get("length", 10))
-    lat    = float(data.get("lat", 48.3371))
-    lon    = float(data.get("lon", -122.55259))
-    mission_geojson = generate_seed_coords(lat, lon, width, length, row_spacing, plant_spacing)
-    print (mission_geojson)
+    coords = data['polygon']['coordinates'][0]
+    perimeter = [(x, y) for x, y in coords]
+    print(perimeter)
+   
 
-    return jsonify(mission_geojson)
+    return "hello"
 
 
 if __name__ == "__main__":
