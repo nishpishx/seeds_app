@@ -45,12 +45,7 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
     geojson_path = path_dubins.toLineString();
-    geojson_filename = "mission_path.geojson"
-    with open(geojson_filename, "w") as f:
-        json.dump(geojson_path, f, indent=2)
-
-    print(f"Saved GeoJSON path to {geojson_filename}")
-    
+    geojson_path.saveToFile("linestring.txt");
     f2c.Visualizer.figure();
     f2c.Visualizer.plot(cells);
     f2c.Visualizer.plot(no_hl);
