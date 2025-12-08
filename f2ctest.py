@@ -4,7 +4,7 @@ import fields2cover as f2c
 rand = f2c.Random(42)
 robot = f2c.Robot(2.0, 6.0)
 field = rand.generateRandField(1e4, 5);
-print(field.exportToJson());
+print(field.getUTMCoordSystem());
 cells = field.getField();
 const_hl = f2c.HG_Const_gen()
 no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.getWidth())
