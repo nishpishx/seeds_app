@@ -1,6 +1,6 @@
 from flask_cors import CORS
 from flask import Flask, request, jsonify
-from seed_generator import generate_seed_coords
+from seed_generator import generate_path_csv
 
 app = Flask(__name__)
 CORS(app)
@@ -19,7 +19,7 @@ def generate_mission():
     perimeter = [(x, y) for x, y in coords]
     print(perimeter)
    
-
+    generate_path_csv(perimeter, csv_filename="path.csv")
     return "hello"
 
 
