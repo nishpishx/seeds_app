@@ -1,5 +1,5 @@
 import fields2cover as f2c
-
+import math
 
 perimeter = [(0.0, 0.0),
                     (32.78050114008247, 1.5825016090575466),
@@ -8,17 +8,6 @@ perimeter = [(0.0, 0.0),
                     (0.0, 0.0)]
 
 
-obstacle_1 = [(4.747806702833676, 5.651789908962271),
-                  (6.273475800086682, 5.651789908962271),
-                  (4.453250327517964, 109.70047130564375),
-                  (3.0803003438120697, 109.64395422172686),
-                  (4.747806702833676, 5.651789908962271)]
-
-obstacle_2 = [(11.630852129420637, 6.44304015055372),
-                  (12.987603683127588, 6.44304015055372),
-                  (11.473218260136703, 110.20912503561279),
-                  (9.997544584299696, 110.20912503561279),
-                  (11.630852129420637, 6.44304015055372)]
 
 
 
@@ -31,19 +20,9 @@ for (lon, lat) in perimeter:
 	points.push_back(f2c.Point(lon, lat))
 outer_ring = f2c.LinearRing(points)
 
-points = f2c.VectorPoint()
-for (lon, lat) in obstacle_1:
-	points.push_back(f2c.Point(lon, lat))
-obstacle_1_ring = f2c.LinearRing(points)
 
-points = f2c.VectorPoint()
-for (lon, lat) in obstacle_2:
-	points.push_back(f2c.Point(lon, lat))
-obstacle_2_ring = f2c.LinearRing(points)
 
 cells_c = f2c.Cells(f2c.Cell(outer_ring))
-cells_c.addRing(0, obstacle_1_ring)
-cells_c.addRing(0, obstacle_2_ring)
 
 const_hl = f2c.HG_Const_gen();
 mid_hl_c = const_hl.generateHeadlands(cells_c, 0.0)
