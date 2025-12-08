@@ -1,48 +1,36 @@
 import fields2cover as f2c
-import math
 
-perimeter = [(0.0, 0.0),
-                    (32.78050114008247, 1.5825016090575466),
-                    (29.57253273552087, 117.33027361366625),
-                    (-1.356751555428749, 116.6520692813985),
-                    (0.0, 0.0)]
+# Your perimeter (must be closed)
+perimeter = [
+    (0.0, 0.0),
+    (32.78, 1.58),
+    (29.57, 117.33),
+    (-1.35, 116.65),
+    (0.0, 0.0)
+]
 
-
-
-
-
-robot_c = f2c.Robot(1.8, 2.0)
-robot_c.setMinTurningRadius(0.5)
-
-
+# 1️⃣ Create LinearRing
 points = f2c.VectorPoint()
-for (lon, lat) in perimeter:
-	points.push_back(f2c.Point(lon, lat))
+for x, y in perimeter:
+    points.push_back(f2c.Point(x, y))
+
 outer_ring = f2c.LinearRing(points)
 
+# 2️⃣ Create Cell
+try:
+    cell = f2c.Cell(outer_ring)
+    print("Cell created successfully!")
+except Exception as e:
+    print("Error creating Cell:", e)
 
+# 3️⃣ Wrap into Cells
+try:
+    cells = f2c.Cells(cell)
+    print("Cells created successfully!")
+except Exception as e:
+    print("Error creating Cells:", e)
 
-cells_c = f2c.Cells(f2c.Cell(outer_ring))
-
-const_hl = f2c.HG_Const_gen();
-mid_hl_c = const_hl.generateHeadlands(cells_c, 0.0)
-no_hl_c = const_hl.generateHeadlands(cells_c, 1.0)
-
-swath_length = f2c.OBJ_SwathLength()
-swaths_c = f2c.SG_BruteForce().generateBestSwaths(swath_length,  robot_c.getCovWidth(), no_hl_c)
-
-
-route_planner = f2c.RP_RoutePlannerBase()
-route = route_planner.genRoute(mid_hl_c, swaths_c)
-
-path_planner = f2c.PP_PathPlanning()
-dubins = f2c.PP_DubinsCurvesCC()
-path = path_planner.planPath(robot_c, route, dubins)
-
-
-f2c.Visualizer.figure();
-f2c.Visualizer.plot(cells_c);
-f2c.Visualizer.plot(mid_hl_c)
-f2c.Visualizer.plot(no_hl_c);
-f2c.Visualizer.plot(path)
-f2c.Visualizer.save("test_route.png")
+# 4️⃣ Optional checks
+print("Area:", cells.area())
+print("Is convex?", cells.isConvex())
+print("GeoJSON preview:", cells.exportToJson())
