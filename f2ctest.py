@@ -48,7 +48,8 @@ snake_sorter = f2c.RP_Snake()
 swaths = snake_sorter.genSortedSwaths(swaths)
 dubins = f2c.PP_DubinsCurves()
 path_dubins = path_planner.planPath(robot, swaths, dubins);
-
+path_gps = f2c.Transform.transformToPrevCRS(path, field);
+path_gps.saveToFile("path.csv");
 
 f2c.Visualizer.figure();
 f2c.Visualizer.plot(cells);
