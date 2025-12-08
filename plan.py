@@ -11,8 +11,7 @@ CORS(app)
 def generate_mission():
     print("hello")
     data = request.get_json()
-    polygon  = float(data.get("polygon"))
-    print(polygon)
+    print(data)
     row_spacing = 2.0
     plant_spacing = 0.5
 
