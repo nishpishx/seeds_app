@@ -47,6 +47,8 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     path_dubins = path_planner.planPath(robot, swaths, dubins);
     path_gps = f2c.Transform.transformPathWithFieldRef(path_dubins, field, "EPSG:4326");
     path_gps.saveToFile("path.csv");
+    geojson_path = path_gps.toLineString();
+    print(geojson_path);
     
     f2c.Visualizer.figure();
     f2c.Visualizer.plot(cells);
