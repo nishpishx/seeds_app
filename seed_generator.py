@@ -43,7 +43,7 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     swaths = snake_sorter.genSortedSwaths(swaths)
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
-    path_gps = f2c.Transform.transformPath(path, "local", "EPSG:4326")
+    path_gps = f2c.Transform.transformPath(path_dubins, "local", "EPSG:4326")
     path_gps.saveToFile("path.csv");
     
     f2c.Visualizer.figure();
