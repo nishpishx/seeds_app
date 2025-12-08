@@ -48,7 +48,5 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     seeds = json.loads(geojson_string)
     
     # Return dict for Flask to jsonify
-    return {
-        "seeds": seeds,
-    }
+    return seeds
    
