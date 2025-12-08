@@ -21,6 +21,7 @@ def generate_mission():
    
     
     result = generate_path_csv(perimeter, csv_filename="path.csv")
+    print("Result:", result)
     return jsonify(result)
 
 if __name__ == "__main__":
