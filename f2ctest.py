@@ -1,68 +1,66 @@
-import math
 import fields2cover as f2c
 
-rand = f2c.Random(42)
-robot = f2c.Robot(2.0, 6.0)
-field = rand.generateRandField(1e4, 5);
-cells = field.getField();
-geojson_str = cells.exportToJson();
-print(geojson_str);
+# ----------------------------
+# 1️⃣ Define field perimeter only
+# ----------------------------
+perimeter = [
+    (0.0, 0.0),
+    (32.78050114008247, 1.5825016090575466),
+    (29.57253273552087, 117.33027361366625),
+    (-1.356751555428749, 116.6520692813985),
+    (0.0, 0.0)
+]
+
+# ----------------------------
+# 2️⃣ Create robot
+# ----------------------------
+robot_c = f2c.Robot(1.8, 2.0)
+robot_c.setMinTurningRadius(0.5)
+
+# ----------------------------
+# 3️⃣ Create outer ring & cell
+# ----------------------------
+points = f2c.VectorPoint()
+for lon, lat in perimeter:
+    points.push_back(f2c.Point(lon, lat))
+
+outer_ring = f2c.LinearRing(points)
+cell_c = f2c.Cell(outer_ring)
+
+# ----------------------------
+# 4️⃣ Wrap cell into Cells
+# ----------------------------
+cells_c = f2c.Cells(cell_c)  # only one polygon, no obstacles
+
+# ----------------------------
+# 5️⃣ Generate headlands
+# ----------------------------
 const_hl = f2c.HG_Const_gen()
-no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.getWidth())
-bf = f2c.SG_BruteForce()
+mid_hl_c = const_hl.generateHeadlands(cells_c, 0.0)
+no_hl_c = const_hl.generateHeadlands(cells_c, 1.0)
 
-swaths = bf.generateSwaths(math.pi, robot.getCovWidth(), no_hl.getGeometry(0))
+# ----------------------------
+# 6️⃣ Generate swaths
+# ----------------------------
+swath_length = f2c.OBJ_SwathLength()
+swaths_c = f2c.SG_BruteForce().generateBestSwaths(swath_length, robot_c.getCovWidth(), no_hl_c)
 
-snake_sorter = f2c.RP_Snake()
-swaths = snake_sorter.genSortedSwaths(swaths)
-swaths.at(0).getPath().exportToWkt()
+# ----------------------------
+# 7️⃣ Generate route and path
+# ----------------------------
+route_planner = f2c.RP_RoutePlannerBase()
+route = route_planner.genRoute(mid_hl_c, swaths_c)
 
-
-robot.setMinTurningRadius(2)  # m
-robot.setMaxDiffCurv(0.1)  # 1/m^2
 path_planner = f2c.PP_PathPlanning()
+dubins = f2c.PP_DubinsCurvesCC()
+path = path_planner.planPath(robot_c, route, dubins)
 
-print("####### Tutorial 6.1 Dubins curves ######")
-dubins = f2c.PP_DubinsCurves()
-path_dubins = path_planner.planPath(robot, swaths, dubins);
-
-
-f2c.Visualizer.figure();
-f2c.Visualizer.plot(cells);
-f2c.Visualizer.plot(no_hl);
-f2c.Visualizer.plot(path_dubins);
-f2c.Visualizer.plot(swaths);
-f2c.Visualizer.save("Tutorial_6_1_Dubins.png");
-
-print("\n\n####### Tutorial 6.2 Dubins curves with Continuous curvature ######");
-dubins_cc = f2c.PP_DubinsCurvesCC();
-path_dubins_cc = path_planner.planPath(robot, swaths, dubins_cc);
-
-f2c.Visualizer.figure();
-f2c.Visualizer.plot(cells);
-f2c.Visualizer.plot(no_hl);
-f2c.Visualizer.plot(path_dubins_cc);
-f2c.Visualizer.plot(swaths);
-f2c.Visualizer.save("Tutorial_6_2_Dubins_CC.png");
-
-print("\n\n####### Tutorial 6.3 Reeds-Shepp curves ######")
-reeds_shepp = f2c.PP_ReedsSheppCurves();
-path_reeds_shepp = path_planner.planPath(robot, swaths, reeds_shepp);
-
-f2c.Visualizer.figure();
-f2c.Visualizer.plot(cells);
-f2c.Visualizer.plot(no_hl);
-f2c.Visualizer.plot(path_reeds_shepp);
-f2c.Visualizer.plot(swaths);
-f2c.Visualizer.save("Tutorial_6_3_Reeds_Shepp.png");
-
-print("\n\n####### Tutorial 6.4 Reeds-Shepp curves with Continuous curvature ######")
-reeds_shepp_hc = f2c.PP_ReedsSheppCurvesHC();
-path_reeds_shepp_hc = path_planner.planPath(robot, swaths, reeds_shepp_hc);
-
-f2c.Visualizer.figure();
-f2c.Visualizer.plot(cells);
-f2c.Visualizer.plot(no_hl);
-f2c.Visualizer.plot(path_reeds_shepp_hc);
-f2c.Visualizer.plot(swaths);
-f2c.Visualizer.save("Tutorial_6_4_Reeds_Shepp_HC.png");
+# ----------------------------
+# 8️⃣ Visualize
+# ----------------------------
+f2c.Visualizer.figure()
+f2c.Visualizer.plot(cells_c)      # field boundary
+f2c.Visualizer.plot(mid_hl_c)      # mid headlands
+f2c.Visualizer.plot(no_hl_c)       # outer headlands
+f2c.Visualizer.plot(path)          # planned path
+f2c.Visualizer.save("test_route_no_obstacles.png")
