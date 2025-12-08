@@ -49,6 +49,7 @@ swaths = snake_sorter.genSortedSwaths(swaths)
 dubins = f2c.PP_DubinsCurves()
 path_dubins = path_planner.planPath(robot, swaths, dubins);
 
+
 f2c.Visualizer.figure();
 f2c.Visualizer.plot(cells);
 f2c.Visualizer.plot(no_hl);
