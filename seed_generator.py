@@ -44,14 +44,15 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     swaths = snake_sorter.genSortedSwaths(swaths)
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
-    geojson_path = path_dubins.toLineString();
-    geojson_filename = "geo.txt"
-    with open(geojson_filename, "w") as f:
-        f.write(str(geojson_path))
-
-    f2c.Visualizer.figure();
-    f2c.Visualizer.plot(cells);
-    f2c.Visualizer.plot(no_hl);
-    f2c.Visualizer.plot(path_dubins);
-    f2c.Visualizer.plot(swaths);
-    f2c.Visualizer.save("Tutorial_image.png");
+    seeds = [{"lon": pt.getX(), "lat": pt.getY()} for pt in path_dubins.getPoints()]
+    
+    # Optional: get GeoJSON representation
+    geojson_string = path_dubins.toLineString().exportToJson()
+    geojson_data = json.loads(geojson_string)
+    
+    # Return dict for Flask to jsonify
+    return {
+        "seeds": seeds,
+        "geojson": geojson_data
+    }
+   
