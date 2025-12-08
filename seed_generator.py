@@ -1,69 +1,52 @@
 import fields2cover as f2c
-from shapely.geometry import Polygon, mapping, LineString
 import math
+# Your perimeter (must be closed)
 
-def generate_seed_coords(base_lat, base_lon, width, length, row_spacing=2.0, plant_spacing=0.5):
-    """
-    Generate coverage path for a rectangle field.
-    """
-    # 1. Local rectangle polygon
-    coords = [(0,0), (width,0), (width,length), (0,length), (0,0)]
-    poly = Polygon(coords)
-
-    # 2. Fields2Cover polygon & coverage path
-    points = [f2c.geometry.Point(x, y) for x,y in poly.exterior.coords]
-    f2c_poly = f2c.geometry.Polygon(points)
-    farm = f2c.fields.Farm(f2c_poly)
-    field = farm.fields[0]
-
-    swaths = f2c.swaths.generate_swaths(field, row_spacing)
-    path = f2c.paths.generate_coverage_path(swaths)
-    coords_path = [(p.x, p.y) for p in path.get_points()]
-
-    # 3. Convert local meters → lat/lon
-    path_latlon = []
-    for x, y in coords_path:
-        delta_lat = y / 111320
-        delta_lon = x / (40075000 * math.cos(math.radians(base_lat)) / 360)
-        path_latlon.append((base_lon + delta_lon, base_lat + delta_lat))
-
-    # 4. LineString
-    line = LineString(path_latlon)
-
-    # 5. Generate waypoints along path
-    total_length = line.length
-    num_plants = max(1, math.floor(total_length / plant_spacing))
-    waypoints = []
-
-    for i in range(num_plants):
-        fraction = i / max(1, num_plants - 1)
-        point = line.interpolate(fraction * total_length)
-        prop = {"label": ""}
-        if i == 0:
-            prop["label"] = "START"
-        elif i == num_plants - 1:
-            prop["label"] = "END"
-        waypoints.append({
-            "type": "Feature",
-            "geometry": mapping(point),
-            "properties": prop
-        })
-
-    # 6. Return GeoJSON FeatureCollection
-    mission_geojson = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": mapping(line),
-                "properties": {
-                    "row_spacing": row_spacing,
-                    "plant_spacing": plant_spacing,
-                    "num_plants": num_plants
-                }
-            }
-        ] + waypoints
-    }
-    return mission_geojson
-
-
+def generate_path_csv(perimeter, csv_filename="path.csv"):
+    # 1️⃣ Create LinearRing
+    points = f2c.VectorPoint()
+    for x, y in perimeter:
+        points.push_back(f2c.Point(x, y))
+    
+    outer_ring = f2c.LinearRing(points)
+    
+    # 2️⃣ Create Cell
+    try:
+        cell = f2c.Cell(outer_ring)
+        print("Cell created successfully!")
+    except Exception as e:
+        print("Error creating Cell:", e)
+    
+    # 3️⃣ Wrap into Cells
+    try:
+        cells = f2c.Cells(cell)
+        print("Cells created successfully!")
+    except Exception as e:
+        print("Error creating Cells:", e)
+    
+    # 4️⃣ Optional checks
+    print("Area:", cells.area())
+    print("Is convex?", cells.isConvex())
+    print("GeoJSON preview:", cells.exportToJson())
+    
+    rand = f2c.Random(42)
+    robot = f2c.Robot(2.0, 6.0)
+    const_hl = f2c.HG_Const_gen()
+    robot.setMinTurningRadius(2)  # m
+    robot.setMaxDiffCurv(0.1);  # 1/m^2
+    path_planner = f2c.PP_PathPlanning()
+    no_hl = const_hl.generateHeadlands(cells, 3.0 * robot.getWidth())
+    bf = f2c.SG_BruteForce()
+    swaths = bf.generateSwaths(math.pi, robot.getCovWidth(), no_hl.getGeometry(0))
+    snake_sorter = f2c.RP_Snake()
+    swaths = snake_sorter.genSortedSwaths(swaths)
+    dubins = f2c.PP_DubinsCurves()
+    path_dubins = path_planner.planPath(robot, swaths, dubins);
+    path_dubins.saveToFile("path.csv");
+    
+    f2c.Visualizer.figure();
+    f2c.Visualizer.plot(cells);
+    f2c.Visualizer.plot(no_hl);
+    f2c.Visualizer.plot(path_dubins);
+    f2c.Visualizer.plot(swaths);
+    f2c.Visualizer.save("Tutorial_image.png");
