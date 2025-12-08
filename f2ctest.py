@@ -1,5 +1,5 @@
 import fields2cover as f2c
-
+import math
 # Your perimeter (must be closed)
 perimeter = [
     (0.0, 0.0),
