@@ -32,7 +32,7 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
 
     
     rand = f2c.Random(42)
-    robot = f2c.Robot(0.000000002, 0.0000068 )
+    robot = f2c.Robot(0.000000002, 0.6)
     robot.setMinTurningRadius(0.000000002)  # m
     robot.setMaxDiffCurv(0.1);  # 1/m^2
     path_planner = f2c.PP_PathPlanning()
