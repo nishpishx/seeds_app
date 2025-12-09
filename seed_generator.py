@@ -33,7 +33,7 @@ def generate_path_csv(perimeter,angle_degrees=0):
     angle_radians = math.radians(angle_degrees)
     rand = f2c.Random(42)
     robot = f2c.Robot(0.002, 0.0000006)
-    robot.setMinTurningRadius(0.001)  # m
+    robot.setMinTurningRadius(0.0001)  # m
     robot.setMaxDiffCurv(99999999);   # 1/m^2
     path_planner = f2c.PP_PathPlanning()
     no_hl = cells
