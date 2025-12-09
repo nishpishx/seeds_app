@@ -3,7 +3,7 @@ import math
 import json
 # Your perimeter (must be closed)
 
-def generate_path_csv(perimeter, csv_filename="path.csv"):
+def generate_path_csv(perimeter,angle_degrees=0):
     # 1️⃣ Create LinearRing
     points = f2c.VectorPoint()
     for x, y in perimeter:
@@ -30,7 +30,7 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     print("Is convex?", cells.isConvex())
     print("GeoJSON preview:", cells.exportToJson())
 
-    
+    angle_radians = math.radians(angle_degrees)
     rand = f2c.Random(42)
     robot = f2c.Robot(0.000000002, 0.6)
     robot.setMinTurningRadius(0.000000002)  # m
@@ -39,7 +39,7 @@ def generate_path_csv(perimeter, csv_filename="path.csv"):
     
     no_hl = cells
     bf = f2c.SG_BruteForce()
-    swaths = bf.generateSwaths(math.pi, robot.getCovWidth(), no_hl.getGeometry(0))
+    swaths = bf.generateSwaths(angle_radians, robot.getCovWidth(), no_hl.getGeometry(0))
     snake_sorter = f2c.RP_Snake()
     swaths = snake_sorter.genSortedSwaths(swaths)
     dubins = f2c.PP_DubinsCurves()
