@@ -36,12 +36,12 @@ def generate_path_csv(perimeter,angle_degrees=0):
     robot.setMinTurningRadius(0.0000000001)  # m
     robot.setMaxDiffCurv(99999999);  # 1/m^2
     path_planner = f2c.PP_PathPlanning()
-    
     no_hl = cells
     bf = f2c.SG_BruteForce()
     swaths = bf.generateSwaths(angle_radians, robot.getCovWidth(), no_hl.getGeometry(0))
     snake_sorter = f2c.RP_Snake()
-    swaths = snake_sorter.genSortedSwaths(swaths)
+    first_swath_point = swaths.getSwath(0).start_point()
+    swaths = snake_sorter.genSortedSwaths(swaths, first_swath_point)
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
     geojson_string = path_dubins.toLineString().exportToJson()
