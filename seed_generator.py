@@ -44,8 +44,14 @@ def generate_path_csv(perimeter,angle_degrees=0):
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
     geojson_string = path_dubins.toLineString().exportToJson()
-    seeds = json.loads(geojson_string)
+    geojson_data = json.loads(geojson_string)
+    coords = geojson_data['coordinates']
+    start_point = coords[0] if coords else None
+    end_point = coords[-1] if coords else None
     
-    # Return dict for Flask to jsonify
-    return seeds
-   
+    return {
+        "path": geojson_data,
+        "start": {"lon": start_point[0], "lat": start_point[1]} if start_point else None,
+        "end": {"lon": end_point[0], "lat": end_point[1]} if end_point else None
+    }
+
