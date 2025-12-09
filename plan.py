@@ -12,14 +12,14 @@ def generate_mission():
     data = request.get_json()
     print(data)
    
-
+    angle = data.get('angle', 0)
 
     coords = data['polygon']['coordinates'][0]
     perimeter = [(x, y) for x, y in coords]
     print(perimeter)
    
     
-    result = generate_path_csv(perimeter, csv_filename="path.csv")
+    result = generate_path_csv(perimeter, angle)
     print("Result:", result)
     return jsonify(result)
 
