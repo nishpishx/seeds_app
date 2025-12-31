@@ -44,7 +44,8 @@ def generate_path_csv(perimeter,angle_degrees=0):
     dubins = f2c.PP_DubinsCurves()
     path_dubins = path_planner.planPath(robot, swaths, dubins);
     geojson_string = path_dubins.toLineString().exportToJson()
-    geojson_string.saveToFile("path.json");
+    geojson_json = path_dubins.exportToJson()
+    geojson_json.saveToFile("path.json");
     geojson_data = json.loads(geojson_string)
     coords = geojson_data['coordinates']
     start_point = coords[0] if coords else None
