@@ -1,0 +1,13 @@
+from geopy.distance import geodesic
+
+
+
+point_a = (40.7128, -74.0060)
+
+point_b = (34.0522, -118.2437)
+
+
+
+distance_meters = geodesic(point_a, point_b).meters
+
+print(distance_meters)
