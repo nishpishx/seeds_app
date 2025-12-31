@@ -22,11 +22,6 @@ def generate_mission():
    
     
     result = generate_path_csv(perimeter, angle)
-    os.makedirs("missions", exist_ok=True)
-    filename = f"missions/mission_{datetime.utcnow().isoformat()}.json"
-
-    with open(filename, "w") as f:
-        json.dump(result, f, indent=2)
     print("Result:", result)
     return jsonify(result)
 
