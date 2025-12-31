@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from seed_generator import generate_path_csv
-
+import json
+import os
+from datetime import datetime
 app = Flask(__name__)
 
 # --------------------------
@@ -20,6 +22,11 @@ def generate_mission():
    
     
     result = generate_path_csv(perimeter, angle)
+    os.makedirs("missions", exist_ok=True)
+    filename = f"missions/mission_{datetime.utcnow().isoformat()}.json"
+
+    with open(filename, "w") as f:
+        json.dump(result, f, indent=2)
     print("Result:", result)
     return jsonify(result)
 
