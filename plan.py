@@ -7,6 +7,25 @@ import psycopg2
 
 app = Flask(__name__)
 
+
+DB_CONFIG = {
+    "dbname": "pathdb",
+    "user": "nisha",
+    "password": "iamtheadmin",
+    "host": "localhost",
+    "port": 5432
+    }
+
+
+def db_test():
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+    cur.execute("SELECT 1;")
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    return result[0]
+
 # --------------------------
 # Generate mission with plant spacing
 # --------------------------
@@ -44,20 +63,3 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
 
-DB_CONFIG = {
-    "dbname": "pathdb",
-    "user": "nisha",
-    "password": "iamtheadmin",
-    "host": "localhost",
-    "port": 5432
-    }
-
-
-def db_test():
-    conn = psycopg2.connect(**DB_CONFIG)
-    cur = conn.cursor()
-    cur.execute("SELECT 1;")
-    result = cur.fetchone()
-    cur.close()
-    conn.close()
-    return result[0]
