@@ -37,7 +37,7 @@ def save_path_to_db(angle, path_geojson, sector_id=None):
     try:
         # Insert path into database using ST_GeomFromGeoJSON
         cur.execute("""
-            INSERT INTO paths (sector_id, angle_deg, geom)
+            INSERT INTO paths (sector_id, angle_deg, path)
             VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
             RETURNING id;
         """, (

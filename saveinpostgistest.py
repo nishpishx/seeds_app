@@ -41,9 +41,9 @@ def test_insert_path():
         print(f"Inserting path with angle: {angle}")
         print(f"LineString: {json.dumps(sample_linestring, indent=2)}")
         
-        # Insert using ST_GeomFromGeoJSON
+        # Insert using ST_GeomFromGeoJSON into 'path' column
         cur.execute("""
-            INSERT INTO paths (sector_id, angle_deg, geom)
+            INSERT INTO paths (sector_id, angle_deg, path)
             VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
             RETURNING id, created_at;
         """, (
@@ -65,7 +65,7 @@ def test_insert_path():
                 id, 
                 sector_id, 
                 angle_deg, 
-                ST_AsGeoJSON(geom) as geometry,
+                ST_AsGeoJSON(path) as geometry,
                 created_at
             FROM paths 
             WHERE id = %s;
