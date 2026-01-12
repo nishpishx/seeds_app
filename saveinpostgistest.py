@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-Test script to insert a LineString into PostGIS paths table
+Test script to insert a LineString into PostGIS test_paths table
 """
 
 import psycopg2
 import json
-import uuid
 from datetime import datetime
 
 DB_CONFIG = {
@@ -32,8 +31,7 @@ def test_insert_path():
     }
     
     angle = 45.0
-    sector_id = str(uuid.uuid4())
-    path_id = str(uuid.uuid4())  # Generate UUID in Python
+    sector_id = None
     
     print("Connecting to database...")
     conn = psycopg2.connect(**DB_CONFIG)
@@ -41,25 +39,23 @@ def test_insert_path():
     
     try:
         print(f"Inserting path with angle: {angle}")
-        print(f"Path ID: {path_id}")
         print(f"LineString: {json.dumps(sample_linestring, indent=2)}")
         
-        # Insert with explicit ID
+        # Insert using ST_GeomFromGeoJSON into test_paths
         cur.execute("""
-            INSERT INTO paths (id, sector_id, angle_deg, path)
-            VALUES (%s, %s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
+            INSERT INTO test_paths (sector_id, angle_deg, path)
+            VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
             RETURNING id, created_at;
         """, (
-            path_id,
             sector_id,
             angle,
             json.dumps(sample_linestring)
         ))
         
-        returned_id, created_at = cur.fetchone()
+        path_id, created_at = cur.fetchone()
         conn.commit()
         
-        print(f"✓ Success! Path inserted with ID: {returned_id}")
+        print(f"✓ Success! Path inserted with ID: {path_id}")
         print(f"✓ Created at: {created_at}")
         
         # Verify by reading it back
@@ -71,7 +67,7 @@ def test_insert_path():
                 angle_deg, 
                 ST_AsGeoJSON(path) as geometry,
                 created_at
-            FROM paths 
+            FROM test_paths 
             WHERE id = %s;
         """, (path_id,))
         
