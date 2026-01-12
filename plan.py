@@ -86,6 +86,7 @@ def generate_mission():
         
         # If deploy is true, save to database
         if deploy:
+            print("deployistrue")
             path_id = save_path_to_db(angle, result.get('path'), sector_id)
             print(f"Path saved to database with ID: {path_id}")
             result['path_id'] = str(path_id)
