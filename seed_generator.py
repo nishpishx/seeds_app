@@ -45,9 +45,12 @@ def generate_path_csv(perimeter,angle_degrees=0):
     path_dubins = path_planner.planPath(robot, swaths, dubins);
     geojson_string = path_dubins.toLineString().exportToJson()
     geojson_data = json.loads(geojson_string)
-    coords = geojson_data['coordinates']
-    start_point = coords[0] if coords else None
-    end_point = coords[-1] if coords else None
+    coords_2d = [[coord[0], coord[1]] for coord in geojson_data['coordinates']]
+    geojson_data['coordinates'] = coords_2d
+    
+    start_point = coords_2d[0] if coords_2d else None
+    end_point = coords_2d[-1] if coords_2d else None
+    
     
     return {
         "path": geojson_data,
