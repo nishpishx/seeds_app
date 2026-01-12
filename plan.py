@@ -37,19 +37,19 @@ def save_path_to_db(angle, path_geojson, sector_id=None):
     try:
         # Insert path into database using ST_GeomFromGeoJSON
         cur.execute("""
-            INSERT INTO paths (sector_id, angle_deg, path)
+            INSERT INTO test_paths (sector_id, angle_deg, path)
             VALUES (%s, %s, ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
-            RETURNING id;
+            RETURNING id, created_at;
         """, (
             sector_id,
             angle,
             json.dumps(path_geojson)
         ))
         
-        
+        path_id, created_at = cur.fetchone()
         conn.commit()
         
-        return 00
+        return path_id
         
     except Exception as e:
         conn.rollback()
@@ -71,7 +71,7 @@ def generate_mission():
    
     angle = data.get('angle', 0)
     deploy = data.get('deploy', False)  # Get deploy boolean  # Optional sector_id
-
+    sector_id = None
     coords = data['polygon']['coordinates'][0]
     perimeter = [(x, y) for x, y in coords]
     print(perimeter)
@@ -86,7 +86,7 @@ def generate_mission():
         
         # If deploy is true, save to database
         if deploy:
-            path_id = save_path_to_db(angle, result.get('path'), 1)
+            path_id = save_path_to_db(angle, result.get('path'), sector_id)
             print(f"Path saved to database with ID: {path_id}")
             
             result['deployed'] = True
