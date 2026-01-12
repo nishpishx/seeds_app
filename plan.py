@@ -88,7 +88,7 @@ def generate_mission():
         if deploy:
             path_id = save_path_to_db(angle, result.get('path'), sector_id)
             print(f"Path saved to database with ID: {path_id}")
-            
+            result['path_id'] = str(path_id)
             result['deployed'] = True
 
     except Exception as e:
