@@ -46,10 +46,10 @@ def save_path_to_db(angle, path_geojson, sector_id=None):
             json.dumps(path_geojson)
         ))
         
-        path_id = cur.fetchone()[0]
+        
         conn.commit()
         
-        return path_id
+        return 00
         
     except Exception as e:
         conn.rollback()
@@ -70,8 +70,7 @@ def generate_mission():
     print(data)
    
     angle = data.get('angle', 0)
-    deploy = data.get('deploy', False)  # Get deploy boolean
-    sector_id = data.get('sector_id', None)  # Optional sector_id
+    deploy = data.get('deploy', False)  # Get deploy boolean  # Optional sector_id
 
     coords = data['polygon']['coordinates'][0]
     perimeter = [(x, y) for x, y in coords]
@@ -87,9 +86,9 @@ def generate_mission():
         
         # If deploy is true, save to database
         if deploy:
-            path_id = save_path_to_db(angle, result.get('path'), sector_id)
+            path_id = save_path_to_db(angle, result.get('path'), 1)
             print(f"Path saved to database with ID: {path_id}")
-            result['path_id'] = str(path_id)
+            
             result['deployed'] = True
 
     except Exception as e:
