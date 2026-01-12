@@ -32,7 +32,7 @@ def test_insert_path():
     }
     
     angle = 45.0
-    sector_id = None
+    sector_id = str(uuid.uuid4())
     path_id = str(uuid.uuid4())  # Generate UUID in Python
     
     print("Connecting to database...")
