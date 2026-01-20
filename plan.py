@@ -7,6 +7,7 @@ import psycopg2
 from psycopg2.extras import Json
 import uuid
 from shapely.geometry import Polygon
+from db_queries import get_study_sites_with_sectors
 
 app = Flask(__name__)
 
@@ -169,6 +170,14 @@ def generate_mission():
         }), 500
 
     return jsonify(result)
+
+@app.route("/study-sites-with-sectors", methods=["GET"])
+def api_get_study_sites_with_sectors():
+    try:
+        data = get_study_sites_with_sectors()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
