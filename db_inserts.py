@@ -106,6 +106,103 @@ def insert_study_site(site_name, longitude=None, latitude=None, description=None
         cur.close()
         conn.close()
         print("\nDatabase connection closed.")
+        
+def insert_sector(site_id, sector_name, boundary_geojson=None):
+    """
+    Insert a sector into the database
+
+    Args:
+        site_id: UUID of the parent study site
+        sector_name: Name of the sector
+        boundary_geojson: GeoJSON Polygon (dict) defining the sector boundary (optional)
+
+    Returns:
+        sector_id: UUID of the inserted sector, or None if failed
+    """
+
+    print("Connecting to database...")
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur = conn.cursor()
+
+    try:
+        print(f"Inserting sector: {sector_name}")
+        print(f"Site ID: {site_id}")
+
+        # Generate UUID for the sector
+        sector_id = str(uuid.uuid4())
+
+        if boundary_geojson:
+            print("Boundary provided (Polygon)")
+            cur.execute("""
+                INSERT INTO sectors (id, site_id, name, boundary)
+                VALUES (
+                    %s,
+                    %s,
+                    %s,
+                    ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)
+                )
+                RETURNING id, created_at;
+            """, (
+                sector_id,
+                site_id,
+                sector_name,
+                json.dumps(boundary_geojson)
+            ))
+        else:
+            print("No boundary provided")
+            cur.execute("""
+                INSERT INTO sectors (id, site_id, name)
+                VALUES (%s, %s, %s)
+                RETURNING id, created_at;
+            """, (
+                sector_id,
+                site_id,
+                sector_name
+            ))
+
+        returned_id, created_at = cur.fetchone()
+        conn.commit()
+
+        print(f"✓ Success! Sector inserted with ID: {returned_id}")
+        print(f"✓ Created at: {created_at}")
+
+        # Verify insert
+        print("\nVerifying inserted data...")
+        cur.execute("""
+            SELECT
+                id,
+                site_id,
+                name,
+                ST_AsGeoJSON(boundary) AS geometry,
+                created_at
+            FROM sectors
+            WHERE id = %s;
+        """, (returned_id,))
+
+        row = cur.fetchone()
+        print(f"ID: {row[0]}")
+        print(f"Site ID: {row[1]}")
+        print(f"Name: {row[2]}")
+        if row[3]:
+            print(f"Boundary: {json.dumps(json.loads(row[3]), indent=2)}")
+        else:
+            print("Boundary: None")
+        print(f"Created: {row[4]}")
+
+        return returned_id
+
+    except Exception as e:
+        conn.rollback()
+        print(f"✗ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+    finally:
+        cur.close()
+        conn.close()
+        print("\nDatabase connection closed.")
+
 
 def test_insert_study_site():
     """Test inserting a study site with a location point"""
