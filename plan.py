@@ -190,7 +190,7 @@ def api_study_sites_with_sectors():
             # ---------- INSERT SECTOR ----------
             if 'site_id' in data and 'boundary' in data:
                 site_id = data.get('site_id')
-                sector_name = data.get('name')
+                name = data.get('name')
                 boundary = data.get('boundary')  # GeoJSON geometry
                 description = data.get('description', '')
 
@@ -202,7 +202,7 @@ def api_study_sites_with_sectors():
 
                 sector_id = insert_sector(
                     site_id=site_id,
-                    name=sector_name,
+                    sector_name=name,
                     boundary=boundary,
                     description=description
                 )
