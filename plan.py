@@ -192,7 +192,6 @@ def api_study_sites_with_sectors():
                 site_id = data.get('site_id')
                 name = data.get('name')
                 boundary = data.get('boundary')  # GeoJSON geometry
-                description = data.get('description', '')
 
                 if not site_id or not name or not boundary:
                     return jsonify({
@@ -203,8 +202,7 @@ def api_study_sites_with_sectors():
                 sector_id = insert_sector(
                     site_id=site_id,
                     sector_name=name,
-                    boundary=boundary,
-                    description=description
+                    boundary=boundary
                 )
 
                 if sector_id:
