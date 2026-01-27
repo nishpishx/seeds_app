@@ -124,10 +124,11 @@ def generate_mission():
    
     angle = data.get('angle', 0)
     deploy = data.get('deploy', False)
-    sector_id = None
+    sector_id = data.get('sector_id', None)
     coords = data['polygon']['coordinates'][0]
     perimeter = [(x, y) for x, y in coords]
     print(perimeter)
+    print(sector_id)
     
     # Calculate anchor point (lower-left corner)
     anchor = calculate_anchor(perimeter)
