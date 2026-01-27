@@ -194,7 +194,7 @@ def api_study_sites_with_sectors():
                 boundary = data.get('boundary')  # GeoJSON geometry
                 description = data.get('description', '')
 
-                if not site_id or not sector_name or not boundary:
+                if not site_id or not name or not boundary:
                     return jsonify({
                         "status": "error",
                         "message": "site_id, name, and boundary are required for sector"
@@ -211,7 +211,7 @@ def api_study_sites_with_sectors():
                     return jsonify({
                         "status": "success",
                         "sector_id": str(sector_id),
-                        "name": sector_name
+                        "name": name
                     })
                 else:
                     return jsonify({
