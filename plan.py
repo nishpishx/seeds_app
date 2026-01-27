@@ -8,7 +8,7 @@ from psycopg2.extras import Json
 import uuid
 from shapely.geometry import Polygon
 from db_queries import get_study_sites_with_sectors
-from db_inserts import insert_study_site
+from db_inserts import insert_study_site, insert_sector
 
 app = Flask(__name__)
 
@@ -174,29 +174,70 @@ def generate_mission():
 
 @app.route("/study-sites-with-sectors", methods=["GET", "POST"])
 def api_study_sites_with_sectors():
-    """Get all study sites with sectors (GET) or create new site (POST)"""
-    
+    """Get all study sites with sectors (GET) or create new site/sector (POST)"""
+
     if request.method == "GET":
         try:
             data = get_study_sites_with_sectors()
             return jsonify(data)
         except Exception as e:
             return jsonify({"status": "error", "message": str(e)}), 500
-    
+
     elif request.method == "POST":
         try:
             data = request.get_json()
+
+            # ---------- INSERT SECTOR ----------
+            if 'site_id' in data and 'boundary' in data:
+                site_id = data.get('site_id')
+                sector_name = data.get('name')
+                boundary = data.get('boundary')  # GeoJSON geometry
+                description = data.get('description', '')
+
+                if not site_id or not sector_name or not boundary:
+                    return jsonify({
+                        "status": "error",
+                        "message": "site_id, name, and boundary are required for sector"
+                    }), 400
+
+                sector_id = insert_sector(
+                    site_id=site_id,
+                    name=sector_name,
+                    boundary=boundary,
+                    description=description
+                )
+
+                if sector_id:
+                    return jsonify({
+                        "status": "success",
+                        "sector_id": str(sector_id),
+                        "name": sector_name
+                    })
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Failed to create sector"
+                    }), 500
+
+            # ---------- INSERT SITE ----------
             site_name = data.get('name')
             longitude = data.get('longitude')
             latitude = data.get('latitude')
             description = data.get('description', '')
-            
-            if not site_name:
-                return jsonify({"status": "error", "message": "Site name is required"}), 400
-            
 
-            site_id = insert_study_site(site_name, longitude, latitude, description)
-            
+            if not site_name:
+                return jsonify({
+                    "status": "error",
+                    "message": "Site name is required"
+                }), 400
+
+            site_id = insert_study_site(
+                site_name,
+                longitude,
+                latitude,
+                description
+            )
+
             if site_id:
                 return jsonify({
                     "status": "success",
@@ -204,13 +245,20 @@ def api_study_sites_with_sectors():
                     "name": site_name
                 })
             else:
-                return jsonify({"status": "error", "message": "Failed to create site"}), 500
-                
+                return jsonify({
+                    "status": "error",
+                    "message": "Failed to create site"
+                }), 500
+
         except Exception as e:
-            print(f"Error creating study site: {e}")
+            print(f"Error creating site/sector: {e}")
             import traceback
             traceback.print_exc()
-            return jsonify({"status": "error", "message": str(e)}), 500
+            return jsonify({
+                "status": "error",
+                "message": str(e)
+            }), 500
+
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
