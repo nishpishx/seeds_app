@@ -58,7 +58,7 @@ def get_study_sites_with_sectors():
             site_id_str = str(site_id)
             
             if site_id_str in site_map:
-                boundary_dict = json.loads(boundary) if boundary else None
+                boundary_dict = json.parse(boundary) if boundary else None
                 coordinates = boundary_dict.get("coordinates") if boundary_dict else None
                 site_map[site_id_str]["sectors"].append({
                     "id": str(sec_id),
