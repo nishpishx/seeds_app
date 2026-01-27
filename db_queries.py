@@ -65,7 +65,7 @@ def get_study_sites_with_sectors():
                     "id": str(sec_id),
                     "name": name,
                     "description": description,
-                    "boundary": coordinates[0]
+                    "boundary": json.loads(boundary) if boundary else None
                 })
         
         return result
