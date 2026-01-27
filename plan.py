@@ -202,7 +202,7 @@ def api_study_sites_with_sectors():
                 sector_id = insert_sector(
                     site_id=site_id,
                     sector_name=name,
-                    boundary=boundary
+                    boundary_geojson=boundary
                 )
 
                 if sector_id:
